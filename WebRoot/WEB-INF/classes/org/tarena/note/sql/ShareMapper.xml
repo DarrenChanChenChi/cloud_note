@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+ 
+ <mapper namespace="org.tarena.note.dao.ShareDao">
+ 
+ <insert id="save" parameterType="org.tarena.note.entity.Share">
+ 	insert into cn_share
+ 	(cn_share_id,cn_share_title,cn_share_body,cn_note_id)
+ 	values 
+ 	(#{cn_share_id},#{cn_share_title},#{cn_share_body},#{cn_note_id})
+ </insert>
+ 
+ <update id="updateShare" parameterType="org.tarena.note.entity.Share">
+ 	update cn_share 
+ 	<set>
+ 		<if test="cn_share_title != null">
+ 			cn_share_title=#{cn_share_title},
+ 		</if>
+ 		<if test="cn_share_body != null">
+ 			cn_share_body=#{cn_share_body},
+ 		</if>
+ 	</set> 
+ 	where cn_note_id=#{cn_note_id}
+ </update>
+ 
+ <select id="findByNoteId" parameterType="string" resultType="org.tarena.note.entity.Share">
+	select * from cn_share where cn_note_id=#{noteId} 
+ </select>
+ 
+ <select id="findByShareId" parameterType="string" resultType="org.tarena.note.entity.Share">
+ 	select * from cn_share where cn_share_id=#{shareId}
+ </select>
+ 
+ <select id="findLikeTitle" parameterType="org.tarena.note.util.Page" resultType="org.tarena.note.entity.Share">
+ 	select * from cn_share where cn_share_title like #{keyword} limit #{begin},#{pageSize}
+ </select>
+ 
+<!-- <select id="findPage" parameterType="org.tarena.note.util.Page" resultType="org.tarena.note.entity.Share">-->
+<!-- 	select * from cn_share limit #{begin},#{pageSize}-->
+<!-- </select>-->
+ 
+</mapper>

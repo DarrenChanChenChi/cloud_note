@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>活动列表</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="x-pjax-version" content="v173">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/favico-144-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/favico-114-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/favico-72-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" href="ico/favico-57-precomposed.png">
+        <link rel="shortcut icon" href="ico/favico.png">
+        <link rel="shortcut icon" href="ico/favico.ico">
+        <link rel="stylesheet" href="styles/icon.css"/>
+        <link rel="stylesheet" href="styles/main.css"/>
+        <link rel="stylesheet" href="styles/prettify.css"/>
+        <!-- 绚丽标题 -->
+		<link href='http://fonts.googleapis.com/css?family=Fruktur' rel='stylesheet' type='text/css'>
+		<link href="styles/style.css" rel="stylesheet" type="text/css">
+        <!-- 全局变量&&AJAX&&回调函数&&COOKIE -->
+		<script type="text/javascript" src="scripts/BaseValues.js"></script>
+<!-- 		<script type="text/javascript" src="scripts/activity.js"></script> -->
+<!-- 		<script type="text/javascript" src="scripts/activity_callback.js"></script> -->
+		<script type="text/javascript" src="scripts/cookie_util.js"></script>
+		<script type="text/javascript" src="scripts/utils.js"></script>
+        <script type="text/javascript" src="scripts/jquery.min.js"></script>
+        <script type="text/javascript" src="scripts/login.js"></script>
+        <script type="text/javascript">
+	        var userId=getCookie("userId");
+			if(userId == null){
+				window.location.href="log_in.html";
+			}
+			$.ajax({
+				url:"user/getname.do",
+				type:"post",
+				data:{"userId":userId},
+				dataType:"json",
+				success:function(result){
+					if(result.status==0){
+						var userName = result.data;
+						$(".profile-username").html(userName);
+					}
+				},
+				error:function(){
+					alert("加载用户名失败");
+				}
+			});
+			//页面加载之后才执行
+        	$(function(){
+        		$.ajax({
+        			url:"activity/load.do",
+        			type:"post",
+        			dataType:"json",
+        			success:function(result){
+        				if(result.status==0){
+        					var activities = result.data;
+       						for(var i = 0; i < activities.length; i++){
+           						var title = activities[i].cn_activity_title;
+           						var body = activities[i].cn_activity_body;
+           						var endtime = activities[i].cn_activity_end_time;
+           						var activityId = activities[i].cn_activity_id;
+           						var date = new Date(endtime);
+           						var id = "col_"+i;
+           	        			$("#row").append("<div class='col-sm-4' id="+id+">"+
+   										"<table class='table-ac'>"+
+											"<tr><td><strong>活动主题：</strong>"+title+"</td></tr>"+
+											"<tr><td><strong>活动内容：</strong>"+body+"</td></tr>"+
+											"<tr><td><strong>截止日期：</strong>"+date.toLocaleDateString()+" "+date.toLocaleTimeString()+"</td></tr>"+
+										"</table>"+
+								"</div>");
+	       						$("#"+id).data("activityId",activityId);
+	       						//alert($("#"+id).data("activityId"));
+           	        		}
+//         					for(var i = 0; i < activities.length; i++){
+//         						var title = activities[i].cn_activity_title;
+//         						var body = activities[i].cn_activity_body;
+//         						var endtime = activities[i].cn_activity_end_time;
+//         						var activityId = activities[i].cn_activity_id;
+//         	        			$("#col_"+i+" td:eq(0)").html("活动主题："+title);
+//         	        			$("#col_"+i+" td:eq(1)").html("活动内容："+body);
+//         	        			$("#col_"+i+" td:eq(2)").html("截止日期："+endtime);
+//         	        			$("#col_"+i).data("activityId",activityId);
+//         	        			/* alert(activities[i].cn_activity_title); */
+//         	        		}
+        				}
+        			},
+        			error:function(){
+        				alert("加载活动列表异常");
+        			}
+        		});
+        		
+        		
+        		$("#row").on("click","div",function(){
+        			var activityId = $(this).data("activityId");
+        			window.location.href="activity_detail.html?activityId="+activityId;
+        		});
+        		
+        	});
+        </script>
+    </head>
+    <body class="animated fadeIn">
+        <header class="header">
+            <div class="header-brand">
+                <a data-pjax=".content-body" href="edit.html">
+                    <!-- <img class="brand-logo" src="images/dummy/8986f28e.stilearn-logo.png" alt="Stilearn Admin Sample Logo"> -->
+                    <p class="my_p" style="font-family: '微软雅黑';font-size: 30px;color: white;margin: 5px auto;">
+                    	大驰哥在线共享笔记
+                    </p>
+                </a>
+            </div>
+            <div class="header-profile">
+                <div class="profile-nav">
+                    <span class="profile-username">XXX</span>
+                    <a  class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="fa fa-angle-down"></span>
+                    </a>
+                    <ul class="dropdown-menu animated flipInX pull-right" role="menu">
+                        <li><a href="Change_password.html"><i class="fa fa-user"></i> 修改密码</a></li>
+                        <li class="divider"></li>
+                        <li><a href="javascript:redirect(userId);"><i class="fa fa-sign-out"></i> 退出登录</a></li>
+                    </ul>
+                </div>
+            </div>
+            <ul class="hidden-xs header-menu pull-right">
+                <li>
+                    <a href="edit.html" title="我的笔记">我的笔记</a>
+                </li>
+            </ul>
+        </header>
+		<div class="row" style='padding:0;'>
+			<!-- 活动第三列 -->
+			<div class="col-sm-12" id='action_part'>
+				<aside class="side-right" id='side_right'>
+					<div class="module" data-toggle="niceScroll">
+						<div class="chat-contact">
+							<div class="contact-body clear_margin">
+								<h3 class="lead"><i class="fa fa-rss"></i> 近期活动</h3>
+								<div id="row" class="row">
+<!-- 									<div class="col-sm-4" id='col_0'> -->
+<!-- 										<table class="table-ac"> -->
+<!-- 											<tr><td></td></tr> -->
+<!-- 											<tr><td></td></tr> -->
+<!-- 											<tr><td></td></tr> -->
+<!-- 										</table> -->
+<!-- 									</div> -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</aside>
+			</div>
+			<!-- 活动第三列 -->
+		</div>
+        <footer class="footer">
+            <p>&copy; 2016 大驰哥在线</p>
+            <div style='position:absolute;top:5PX;height:30px;right:20px;line-height:26px;border:1px solid #0E7D76;display:none;background-image:url("images/background.png");'>
+				<strong style='color:#0E7D76;margin:0 10px;'></strong>
+			</div>
+        </footer>
+        
+		<!-- Bootstrap框架JS -->
+		<script type="text/javascript" src="scripts/bootstrap.min.js"></script>   
+        <script type="text/javascript" src="scripts/theme-setup.js"></script>
+		
+		<!-- 页面事件处理JS -->
+<!-- 		<script type="text/javascript" src='scripts/local.js'></script> -->
+		<script type="text/javascript">
+			function get_dom(e){
+				return document.getElementById(e);
+			}
+			function set_height(){
+				var pc_height=window.innerHeight;
+				pc_height=pc_height-100;
+				get_dom('side_right').style.height=pc_height+'px';
+			}
+			set_height();
+			window.onresize=function(){
+				set_height();
+			}
+			window.onload=function(){
+				//activity_list();
+			}
+		</script>
+    </body>		
+</html>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+ 
+ <mapper namespace="org.tarena.note.dao.CommentDao">
+ 
+ <insert id="save" parameterType="org.tarena.note.entity.Comment">
+ 	insert into cn_comment(cn_comment_id,cn_section_id,cn_user_id,cn_user_name,cn_comment_content)
+ 	values (#{cn_comment_id},#{cn_section_id},#{cn_user_id},#{cn_user_name},#{cn_comment_content})
+ </insert>
+ 
+ <select id="findBySectionId" parameterType="string" resultType="org.tarena.note.entity.Comment">
+ 	select * from cn_comment where cn_section_id=#{sectionId}
+ </select>
+ 
+ 
+</mapper>

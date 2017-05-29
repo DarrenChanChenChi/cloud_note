@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="styles/login.css"/>
+<!-- 第三方验证码 -->
+<link rel="stylesheet"
+	href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script type="text/javascript" src="scripts/jquery.min.js"></script>
+<script type="text/javascript" src="scripts/cookie_util.js"></script>
+<script type="text/javascript" src="scripts/login.js">
+</script>
+<script type="text/javascript" src="scripts/regist.js">
+</script>
+<!-- 引入封装了failback的接口--initGeetest，第三方验证码 -->
+<script src="http://static.geetest.com/static/tools/gt.js"></script>
+</head>
+	<body>
+		<div class="global">
+			<div class="log log_in" tabindex='-1' id='dl'>
+				<dl>
+					<dt>
+						<div class='header'>
+							<h3>登&nbsp;录</h3>
+						</div>
+					</dt>
+					<dt></dt>
+					<dt>
+						<div class='letter'>
+							用户名:&nbsp;<input type="text" name="" id="count" tabindex='1' onfocus="return true"/>
+							<span id="count_span"></span>
+						</div>
+					</dt>
+					<dt>
+						<div class='letter'>
+							密&nbsp;&nbsp;&nbsp;码:&nbsp;<input type="password" name="" id="password" tabindex='2'/>
+							<span id="password_span"></span>
+						</div>
+					</dt>
+					<dt style="margin: 20px auto;">
+						<!-- 第三方验证码 -->
+						<div id="embed-captcha" style="margin:0 80px"></div>
+						<p id="wait" class="show" style="margin:0 80px">正在加载验证码......</p>
+						<p id="notice" class="hide" style="margin:0 80px">请先拖动验证码到相应位置</p>
+					</dt>
+					<dt>
+						<div>
+							<input type="button" name="" id="login" value='&nbsp登&nbsp录&nbsp' tabindex='3'/>
+							<input type="button" name="" id="sig_in" value='&nbsp注&nbsp册&nbsp' tabindex='4'/>
+						</div>
+						
+					</dt>
+				</dl>
+			</div>
+			<div class="sig sig_out" tabindex='-1' id='zc' style='visibility:hidden;'>
+				<dl>
+					<dt>
+						<div class='header'>
+							<h3>注&nbsp;册</h3>
+						</div>
+					</dt>
+					<dt></dt>
+					<dt>
+						<div class='letter'>
+							用户名:&nbsp;<input type="text" name="" id="regist_username" tabindex='5'/>
+							<div class='warning' id='warning_1'><span>该用户名不可用</span></div>
+						</div>
+					</dt>
+					<dt>
+						<div class='letter'>
+							昵&nbsp;&nbsp;&nbsp;称:&nbsp;<input type="text" name="" id="nickname" tabindex='6'/>
+							<div class='warning' id='warning_4'><span>该用户名不可用</span></div>
+						</div>
+					</dt>
+					<dt>
+						<div class='letter'>
+							密&nbsp;&nbsp;&nbsp;码:&nbsp;<input type="password" name="" id="regist_password" tabindex='7'/>
+							<div class='warning' id='warning_2'><span>密码长度过短</span></div>
+						</div>
+					</dt>
+					<dt>
+						<div class='password'>
+							&nbsp;&nbsp;&nbsp;确认密码:&nbsp;<input type="password" name="" id="final_password" tabindex='8'/>
+							<div class='warning' id='warning_3'><span>密码输入不一致</span></div>
+						</div>
+					</dt>
+					<dt>
+						<div>
+							<input type="button" name="" id="regist_button" value='&nbsp注&nbsp册&nbsp' tabindex='9'/>
+							<input type="button" name="" id="back" value='&nbsp返&nbsp回&nbsp' tabindex='10'/>
+							<script type="text/javascript">
+							function get(e){
+								return document.getElementById(e);
+							}
+							get('sig_in').onclick=function(){
+								get('dl').className='log log_out';
+								get('zc').className='sig sig_in';
+							}
+							get('back').onclick=function(){
+								get('zc').className='sig sig_out';
+								get('dl').className='log log_in';
+							}
+							window.onload=function(){
+								var t =setTimeout("get('zc').style.visibility='visible'",800);
+								get('final_password').onblur=function(){
+									var npassword=get('regist_password').value;
+									var fpassword=get('final_password').value;
+									if(npassword!=fpassword){
+										get('warning_3').style.display='block';
+									}
+								}
+								get('regist_password').onblur=function(){
+									var npassword=get('regist_password').value.length;
+									if(npassword<6&&npassword>0){
+										get('warning_2').style.display='block';
+									}
+								}
+								get('regist_password').onfocus=function(){
+									get('warning_2').style.display='none';
+								}
+								get('final_password').onfocus=function(){
+									get('warning_3').style.display='none';
+								}
+							}
+							</script>
+							<!-- 第三方验证码 -->
+							<script type="text/javascript">
+							var handlerEmbed = function(captchaObj) {
+								$("#login").click(function(e) {
+									var validate = captchaObj.getValidate();
+									if (!validate) {
+										$("#notice")[0].className = "show";
+										setTimeout(function() {
+											$("#notice")[0].className = "hide";
+										}, 2000);
+										e.preventDefault();
+									}else{
+										login();
+									}
+									
+								});
+								// 将验证码加到id为captcha的元素里
+								captchaObj.appendTo("#embed-captcha");
+								captchaObj.onReady(function() {
+									$("#wait")[0].className = "hide";
+								});
+								// 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+							};
+							$.ajax({
+								// 获取id，challenge，success（是否启用failback）
+								url : "StartCaptchaServlet",
+								type : "get",
+								dataType : "json",
+								success : function(data) {
+									// 使用initGeetest接口
+									// 参数1：配置参数
+									// 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+									initGeetest({
+										gt : data.gt,
+										challenge : data.challenge,
+										product : "float", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+										offline : !data.success
+									// 表示用户后台检测极验服务器是否宕机，一般不需要关注
+									}, handlerEmbed);
+								}
+							});
+							</script>
+						</div>
+					</dt>
+				</dl>
+			</div>
+		</div>
+	</body>
+</html>

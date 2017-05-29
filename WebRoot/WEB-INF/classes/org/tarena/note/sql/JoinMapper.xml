@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+ 
+ <mapper namespace="org.tarena.note.dao.BookJoinDao">
+ 
+ <!-- 单个对象关联 -->
+ <!-- 关联查询方法1 -->
+ <select id="findJoinUser"  resultMap="bookMap">
+ 	select * from cn_notebook book join cn_user user on(book.cn_user_id=user.cn_user_id)
+ </select>
+ <resultMap id="bookMap" type="org.tarena.note.entity.NoteBook">
+ 	<id property="cn_notebook_id" column="cn_notebook_id"/>
+ 	<result property="cn_user_id" column="cn_user_id"/>
+ 	<result property="cn_notebook_type_id" column="cn_notebook_type_id"/>
+ 	<result property="cn_notebook_name" column="cn_notebook_name"/>
+ 	<result property="cn_notebook_desc" column="cn_notebook_desc"/>
+ 	<result property="cn_notebook_createtime" column="cn_notebook_createtime"/>
+ 	<!-- 关联属性装载 -->
+ 	<association property="user" javaType="org.tarena.note.entity.User">
+ 		<id property="cn_user_id" column="cn_user_id"/>
+ 		<result property="cn_user_name" column="cn_user_name"/>
+	 	<result property="cn_user_password" column="cn_user_password"/>
+	 	<result property="cn_user_token" column="cn_user_token"/>
+	 	<result property="cn_user_desc" column="cn_user_desc"/>
+ 	</association>
+ </resultMap>
+ 
+ <!-- 关联查询方法2 -->
+ <select id="findJoinUser1" resultMap="bookMap1">
+ 	select * from cn_notebook
+ </select>
+ <resultMap id="bookMap1" type="org.tarena.note.entity.NoteBook">
+ 	<!-- 可以省略名称对应 -->
+ 	<id property="cn_notebook_id" column="cn_notebook_id"/>
+ 	<result property="cn_user_id" column="cn_user_id"/>
+ 	<result property="cn_notebook_type_id" column="cn_notebook_type_id"/>
+ 	<result property="cn_notebook_name" column="cn_notebook_name"/>
+ 	<result property="cn_notebook_desc" column="cn_notebook_desc"/>
+ 	<result property="cn_notebook_createtime" column="cn_notebook_createtime"/>
+ 	<!-- 关联属性装载 -->
+ 	<association property="user" javaType="org.tarena.note.entity.User"
+ 		select="findUserById" column="cn_user_id">
+ 	</association>
+ </resultMap>
+ <select id="findUserById" parameterType="string" resultType="org.tarena.note.entity.User">
+ 	select * from cn_user where cn_user_id=#{id}
+ </select>
+ 
+ <!-- 集合关联 -->
+ <!-- 关联查询方法1 -->
+ <select id="findJoinBooks" parameterType="string" resultMap="userMap">
+ 	select * from cn_user user join cn_notebook book
+ 		on(user.cn_user_id=book.cn_user_id)
+ 			where user.cn_user_id=#{id}
+ </select>
+ <resultMap id="userMap" type="org.tarena.note.entity.User">
+ 	<id property="cn_user_id" column="cn_user_id"/>
+	<result property="cn_user_name" column="cn_user_name"/>
+ 	<result property="cn_user_password" column="cn_user_password"/>
+ 	<result property="cn_user_token" column="cn_user_token"/>
+ 	<result property="cn_user_desc" column="cn_user_desc"/>
+ 	<!-- ofType是范型的类型 -->
+ 	<collection property="books" javaType="java.util.List" ofType="org.tarena.note.entity.NoteBook">
+ 		<id property="cn_notebook_id" column="cn_notebook_id"/>
+	 	<result property="cn_user_id" column="cn_user_id"/>
+	 	<result property="cn_notebook_type_id" column="cn_notebook_type_id"/>
+	 	<result property="cn_notebook_name" column="cn_notebook_name"/>
+	 	<result property="cn_notebook_desc" column="cn_notebook_desc"/>
+	 	<result property="cn_notebook_createtime" column="cn_notebook_createtime"/>
+ 	</collection>
+ </resultMap>
+ 
+ <!-- 关联查询方法2 -->
+ <select id="findJoinBooks1" parameterType="string" resultMap="userMap1">
+ 	select * from cn_user where cn_user_id=#{id}
+ </select>
+ <resultMap id="userMap1" type="org.tarena.note.entity.User">
+ 	<!-- User属性装载，省略 -->
+ 	<collection property="books" javaType="java.util.List" ofType="org.tarena.note.entity.NoteBook" select="findBooks" column="cn_user_id">
+ 	</collection>
+ </resultMap>
+ <select id="findBooks" parameterType="string" resultType="org.tarena.note.entity.NoteBook">
+ 	select * from cn_notebook where cn_user_id=#{userId}
+ </select>
+ 
+</mapper>

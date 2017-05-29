@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+ 
+ <mapper namespace="org.tarena.note.dao.NoteDao">
+ 
+ <!-- 不光可以用array,还可以用list -->
+ <delete id="deleteNotes">
+ 	delete from cn_note where cn_note_id in
+ 	<foreach collection="array" item="id" separator="," open="(" close=")">
+ 		#{id}
+ 	</foreach>
+ </delete>
+ 
+ <update id="dynamicUpdate" parameterType="org.tarena.note.entity.Note">
+ 	 update cn_note
+ 	 <set>
+	 	 <if test="cn_notebook_id != null">
+	 	 cn_notebook_id=#{cn_notebook_id},
+	 	 </if>
+	 	 <if test="cn_user_id != null"> 
+		 cn_user_id=#{cn_user_id},
+		 </if>
+		 <if test="cn_note_status_id != null">
+		 cn_note_status_id=#{cn_note_status_id},
+		 </if>
+		 <if test="cn_note_type_id != null">
+		 cn_note_type_id=#{cn_note_type_id},
+		 </if>
+		 <if test="cn_note_title != null">
+		 cn_note_title=#{cn_note_title},
+		 </if>
+		 <if test="cn_note_body != null">
+		 cn_note_body=#{cn_note_body},
+		 </if>
+		 <if test="cn_note_create_time != null">
+		 cn_note_create_time=#{cn_note_create_time},
+		 </if>
+		 <if test="cn_note_last_modify_time != null">
+		 cn_note_last_modify_time=#{cn_note_last_modify_time}
+		 </if> 
+	 </set>
+ 	
+ </update>
+ <select id="findNotes" parameterType="org.tarena.note.vo.SearchBean"
+ 	resultType="org.tarena.note.entity.Note">
+ 	select * from cn_note 
+ 	<where>
+	 	<if test="title != null">
+	 	   cn_note_title like #{title}
+	 	</if>
+	 	<if test="status != null">
+	 		and cn_note_status_id=#{status}
+	 	</if>
+	 	<if test="longBeginTime != null">
+	 		and cn_note_create_time>#{longBeginTime}
+	 	</if>
+	 	<if test="longEndTime != null">
+	 		and cn_note_create_time&lt;=#{longEndTime}
+	 	</if>
+	 	<if test="userId != null">
+	 		and cn_user_id=#{userId}
+	 	</if>
+ 	</where>
+ </select>
+ 
+ <select id="findRecycle" parameterType="string" resultType="org.tarena.note.entity.Note">
+ 	select * from cn_note where cn_note_status_id='2' and cn_user_id=#{userId}
+ </select>
+ <!-- 只是说明与哪个实体类对应 -->
+ <select id="findByBookId" parameterType="string" resultType="org.tarena.note.entity.Note">
+ 	select * from cn_note where cn_notebook_id=#{bookId} and cn_note_status_id!='2'
+ </select>
+ 
+ <select id="findById" parameterType="string" resultType="org.tarena.note.entity.Note">
+ 	select * from cn_note where cn_note_id=#{id}
+ </select>
+ 
+ <insert id="save" parameterType="org.tarena.note.entity.Note">
+ 	insert into cn_note(cn_note_id,cn_notebook_id,cn_user_id,cn_note_status_id,
+ 	cn_note_type_id,cn_note_title,cn_note_body,cn_note_create_time,
+ 	cn_note_last_modify_time) values (#{cn_note_id},#{cn_notebook_id},
+ 	#{cn_user_id},#{cn_note_status_id},#{cn_note_type_id},#{cn_note_title},
+ 	#{cn_note_body},#{cn_note_create_time},#{cn_note_last_modify_time})
+ </insert>
+ 
+ <update id="modify" parameterType="map">
+ 	update cn_note set cn_note_title=#{title},cn_note_body=#{body},
+ 	cn_note_last_modify_time=#{time} where cn_note_id=#{id}
+ </update>
+ 
+ <update id="updateStatus" parameterType="string">
+ 	update cn_note 
+ 	set cn_note_status_id='2' 
+ 	where cn_note_id=#{noteId}
+ </update>
+ 
+ <update id="updateBookId" parameterType="map">
+ 	update cn_note 
+ 	set cn_notebook_id=#{bookId} 
+ 	where cn_note_id=#{noteId} 
+ 	and cn_note_status_id='1'
+ </update>
+ 
+ <update id="recoverStatus" parameterType="map">
+ 	update cn_note 
+ 	set cn_note_status_id='1',
+ 	cn_notebook_id=#{bookId} 
+ 	where cn_note_id=#{noteId}
+ </update>
+ 
+ <delete id="deleteByNoteId" parameterType="string">
+ 	delete from cn_note 
+ 	where cn_note_id=#{noteId}
+ </delete>
+ 
+ <delete id="deleteAll" parameterType="string">
+ 	delete from cn_note 
+ 	where cn_note_status_id='2' 
+ 	and cn_user_id=#{userId}
+ </delete>
+ 
+ 
+</mapper>

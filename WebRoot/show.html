@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>show.html</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+    <script type="text/javascript" src="scripts/jquery.min.js"></script>
+    <script type="text/javascript">
+    	$(function(){
+    		//清空原有内容
+    		$("#noput_note_title").html("");
+    		$("#noput_note_title").next().html("");
+    		//发送Ajax请求
+    		$.ajax({
+    			url:"note/loadshare.do?shareId=e8c93f14-948a-45c6-8983-2217948d229d",
+    			type:"get",
+    			dataType:"json",
+    			success:function(result){
+    				if(result.status==0){
+    					var note = result.data;//返回的笔记json对象
+    					var noteTitle = note.cn_note_title;
+    					var noteBody = note.cn_note_body;
+    					$("#noput_note_title").html(noteTitle);
+    					$("#noput_note_title").next().html(noteBody);
+    				}
+    			},
+    			error:function(){
+    				alert("加载笔记信息失败");
+    			}
+    		});
+    	});
+    </script>
+  </head>
+  
+  <body>
+  	<div class="col-sm-7" id='pc_part_5' style='display:none;' >
+				<div class="pc_top_third">
+					<div class="row">
+						<div class="col-xs-9">
+							<h3>预览笔记</h3>
+						</div>
+					</div>
+				</div>
+				<aside class="side-right" id='fifth_side_right'>
+					<div class="module" data-toggle="niceScroll">
+						<div id="noput_note_all" class="chat-contact">
+							<div class="contact-body clear_margin">
+								<h4 id="noput_note_title">
+									
+								</h4>
+								<p>
+								 
+								</p>
+								<!-- <p data-section-id="" class="commentable-section" style="font-family: '微软雅黑';font-weight: bold;font-size: 20px;color: #942874;display:none;margin-bottom: 100px;padding: 10px; border: 1px dashed purple;">
+								  	您对本篇笔记有何看法呢？请尽情发表评论吧。。。
+								</p> -->
+							</div>
+							
+							<!-- 多说评论框 start -->
+							<div id="comment-box" ></div>
+							<!-- 多说评论框 end -->
+							<!-- UY BEGIN -->
+							
+						</div>
+					</div>
+				</aside>
+				 
+			</div>
+			<!-- 预览笔记 -->
+  </body>
+</html>
